@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả tìm kiếm - {{ query }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .search-form {
+            margin-bottom: 15px;
+        }
+        input[type="text"] {
+            width: 50%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        input[type="text"]:focus {
+            border-color: #e74c3c;
+            outline: none;
+        }
+        .search-options {
+            margin: 15px 0;
+        }
+        .radio-group {
+            display: inline-block;
+            margin: 0 15px;
+        }
+        input[type="radio"] {
+            margin-right: 5px;
+        }
+        button {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #c0392b;
+        }
+        .stats {
+            color: #666;
+            font-size: 14px;
+        }
+        .results-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .result-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .result-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 15px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .result-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .result-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a0dab;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .result-title:hover {
+            text-decoration: underline;
+        }
+        .result-url {
+            color: #006621;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .result-snippet {
+            color: #545454;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+        .snippet-full {
+            display: none;
+        }
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #1a0dab;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            text-decoration: underline;
+        }
+        .toggle-btn:hover {
+            color: #0d47a1;
+        }
+        .result-score {
+            color: #666;
+            font-size: 12px;
+            font-style: italic;
+        }
+        .pagination {
+            background-color: white;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .pagination a {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 0 5px;
+            color: #1a0dab;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .pagination a:hover {
+            background-color: #f5f5f5;
+        }
+        .pagination .disabled {
+            color: #ccc;
+            cursor: not-allowed;
+            border-color: #eee;
+        }
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        /* Highlight styling */
+        b {
+            background-color: #ffff99;
+            font-weight: bold;
+        }
+        /* Detail button styling */
+        .detail-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .detail-btn:hover {
+            background-color: #2980b9;
+        }
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s;
+        }
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .modal-header {
+            background-color: #e74c3c;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+        .close {
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+            line-height: 1;
+        }
+        .close:hover {
+            color: #ecf0f1;
+        }
+        .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            max-height: calc(80vh - 80px);
+        }
+        .modal-section {
+            margin-bottom: 25px;
+        }
+        .modal-section h3 {
+            color: #e74c3c;
+            font-size: 18px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 8px;
+        }
+        .ingredients-list {
+            list-style: none;
+            padding: 0;
+        }
+        .ingredients-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+        }
+        .ingredients-list li:before {
+            content: "🥘 ";
+            margin-right: 8px;
+        }
+        .instructions-list {
+            list-style: none;
+            counter-reset: step-counter;
+            padding: 0;
+        }
+        .instructions-list li {
+            counter-increment: step-counter;
+            padding: 12px 0 12px 40px;
+            position: relative;
+            color: #333;
+            line-height: 1.6;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .instructions-list li:before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 12px;
+            background-color: #3498db;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .modal-footer {
+            padding: 15px 25px;
+            text-align: center;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        .modal-footer a {
+            display: inline-block;
+            background-color: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .modal-footer a:hover {
+            background-color: #229954;
+        }
+    </style>
+</head>
+<body>
+    <!-- Search Form Header -->
+    <div class="header">
+        <form class="search-form" method="GET" action="/search">
+            <div>
+                <input type="text" name="query" value="{{ query }}" placeholder="Nhập tên món ăn hoặc nguyên liệu..." required>
+            </div>
+            
+            <div class="search-options">
+                <div class="radio-group">
+                    <input type="radio" id="and" name="method" value="AND" {% if method == 'AND' %}checked{% endif %}>
+                    <label for="and">AND - Chứa tất cả từ khóa</label>
+                </div>
+                
+                <div class="radio-group">
+                    <input type="radio" id="or" name="method" value="OR" {% if method == 'OR' %}checked{% endif %}>
+                    <label for="or">OR - Chứa ít nhất 1 từ khóa</label>
+                </div>
+            </div>
+            
+            <div>
+                <button type="submit">🔍 Tìm Kiếm</button>
+            </div>
+        </form>
+        
+        <!-- Search Statistics -->
+        {% if query %}
+        <div class="stats">
+            {% if results_list %}
+                Tìm thấy {{ total_results }} kết quả cho từ khóa "<strong>{{ query }}</strong>" 
+                (trang {{ current_page }} / {{ total_pages }})
+            {% else %}
+                Không tìm thấy kết quả nào cho từ khóa "<strong>{{ query }}</strong>"
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Results -->
+    {% if results_list %}
+    <div class="results-container">
+        {% for result in results_list %}
+        <div class="result-item">
+            <div class="result-header">
+                <!-- Chỉ hiển thị ảnh khi có image_url -->
+                {% if result.image_url %}
+                <img src="{{ result.image_url }}" alt="{{ result.original_title }}" class="result-image" 
+                     onerror="this.style.display='none'">
+                {% endif %}
+                
+                <div class="result-content">
+                    <a href="{{ result.url }}" class="result-title" target="_blank">
+                        {{ result.title|safe }}
+                    </a>
+                    
+                    <div class="result-url">{{ result.url }}</div>
+                    
+                    <div class="result-snippet">
+                        <span class="snippet-short" id="snippet-short-{{ loop.index }}">
+                            {{ result.snippet_short|safe }}
+                        </span>
+                        <span class="snippet-full" id="snippet-full-{{ loop.index }}">
+                            {{ result.snippet_full|safe }}
+                        </span>
+                        
+                        {% if result.snippet_full|length > 150 %}
+                        <button class="toggle-btn" onclick="toggleSnippet({{ loop.index }})">
+                            <span id="toggle-text-{{ loop.index }}">Xem thêm</span>
+                        </button>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="result-score">
+                        Điểm phù hợp: {{ result.score }}
+                    </div>
+                    
+                    <button class="detail-btn" onclick="openModal({{ loop.index }})">
+                        📖 Xem chi tiết công thức
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal for this recipe -->
+        <div id="modal-{{ loop.index }}" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>{{ result.original_title }}</h2>
+                    <button class="close" onclick="closeModal({{ loop.index }})">&times;</button>
+                </div>
+                <div class="modal-body">
+                    {% if result.image_url %}
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <img src="{{ result.image_url }}" alt="{{ result.original_title }}" 
+                             style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
+                             onerror="this.style.display='none'">
+                    </div>
+                    {% endif %}
+                    
+                    <div class="modal-section">
+                        <h3>🥘 Nguyên liệu</h3>
+                        {% if result.ingredients %}
+                        <ul class="ingredients-list">
+                            {% for ingredient in result.ingredients %}
+                            <li>{{ ingredient }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p style="color: #999; font-style: italic;">Không có thông tin nguyên liệu</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3>👨‍🍳 Cách làm</h3>
+                        {% if result.instructions %}
+                        <ul class="instructions-list">
+                            {% for instruction in result.instructions %}
+                            <li>{{ instruction }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p style="color: #999; font-style: italic;">Không có hướng dẫn</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ result.url }}" target="_blank">🌐 Xem công thức gốc</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div class="pagination">
+        {% if has_prev %}
+        <a href="/search?query={{ query }}&method={{ method }}&page={{ current_page - 1 }}">« Trang trước</a>
+        {% else %}
+        <span class="disabled">« Trang trước</span>
+        {% endif %}
+        
+        <span style="margin: 0 20px; color: #666;">
+            Trang {{ current_page }} / {{ total_pages }}
+        </span>
+        
+        {% if has_next %}
+        <a href="/search?query={{ query }}&method={{ method }}&page={{ current_page + 1 }}">Trang sau »</a>
+        {% else %}
+        <span class="disabled">Trang sau »</span>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- No Results -->
+    {% if query %}
+    <div class="results-container">
+        <div class="no-results">
+            <h3>🍽️ Không tìm thấy món ăn nào</h3>
+            <p>Hãy thử:</p>
+            <ul style="text-align: left; display: inline-block;">
+                <li>Kiểm tra chính tả từ khóa</li>
+                <li>Sử dụng từ khóa đơn giản hơn</li>
+                <li>Thử chế độ "OR" thay vì "AND"</li>
+                <li>Tìm kiếm theo nguyên liệu (vd: "thịt bò", "cà rốt")</li>
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    <!-- JavaScript -->
+    <script>
+        function toggleSnippet(index) {
+            const shortSnippet = document.getElementById('snippet-short-' + index);
+            const fullSnippet = document.getElementById('snippet-full-' + index);
+            const toggleText = document.getElementById('toggle-text-' + index);
+            
+            if (shortSnippet.style.display === 'none') {
+                // Show short, hide full
+                shortSnippet.style.display = 'inline';
+                fullSnippet.style.display = 'none';
+                toggleText.textContent = 'Xem thêm';
+            } else {
+                // Show full, hide short
+                shortSnippet.style.display = 'none';
+                fullSnippet.style.display = 'inline';
+                toggleText.textContent = 'Thu gọn';
+            }
+        }
+        
+        // Open modal
+        function openModal(index) {
+            const modal = document.getElementById('modal-' + index);
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+        
+        // Close modal
+        function closeModal(index) {
+            const modal = document.getElementById('modal-' + index);
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        // Close modal on ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    if (modal.style.display === 'block') {
+                        modal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            }
+        });
+        
+        // Auto-focus search input when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('input[name="query"]');
+            if (searchInput && !searchInput.value) {
+                searchInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>

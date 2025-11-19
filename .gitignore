@@ -1,0 +1,19 @@
+# .gitignore
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+.venv
+env/
+venv/
+
+# IDE settings (VS Code, PyCharm)
+.vscode/
+.idea/
+
+# Mac OS system file (nếu dùng Mac)
+.DS_Store

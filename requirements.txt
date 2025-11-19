@@ -1,0 +1,4 @@
+beautifulsoup4==4.14.2
+Flask==3.1.2
+Requests==2.32.5
+underthesea==8.3.0
