@@ -27,6 +27,34 @@ This module demonstrates versatility in handling different web architectures.
 | **`dienmayxanh_crawler.py`** | **AJAX & ID Tracking** | Solves the challenge of **Dynamic Content Loading**. Instead of URL pagination, it reverse-engineers the **AJAX POST requests**, manages payload parameters (`pageindex`, `listdishid`), and tracks unique IDs to ensure no data duplication. |
 | **`disneycooking_crawler.py`** | **AI-Assisted Extraction** | The most advanced crawler. It integrates **Google Gemini API** to parse unstructured recipe text into standardized JSON objects (Title, Ingredients, Instructions). It also implements **Exponential Backoff** logic to robustly handle network instability or API rate limits. |
 
+
+## 🗂️ Data Schema (Normalized)
+
+Despite sourcing data from multiple websites with different HTML structures, all crawled data is **normalized** into a unified JSON format before storage. This consistency ensures the Indexing Engine functions correctly across all datasets.
+
+**Example JSON Object:**
+
+```json
+{
+  "title": "Bò Kho Bánh Mì",
+  "url": "[https://www.dienmayxanh.com/vao-bep/cach-nau-bo-kho-banh-mi-](https://www.dienmayxanh.com/vao-bep/cach-nau-bo-kho-banh-mi-)...",
+  "image_url": "[https://cdn.dienmayxanh.com/.../bo-kho-banh-mi.jpg](https://cdn.dienmayxanh.com/.../bo-kho-banh-mi.jpg)",
+  "video_url": "[https://www.youtube.com/embed/](https://www.youtube.com/embed/)...",
+  "ingredients": [
+    "500g thịt bò nạm",
+    "2 củ cà rốt",
+    "1 gói gia vị bò kho",
+    "Sả, tỏi, hành tím"
+  ],
+  "instructions": [
+    "Sơ chế thịt bò: rửa sạch và cắt khối vuông vừa ăn.",
+    "Ướp thịt với gia vị bò kho trong 30 phút.",
+    "Phi thơm tỏi, xào săn thịt bò.",
+    "Hầm thịt với nước dừa tươi cho đến khi mềm."
+  ]
+}
+```
+
 ### 2. Indexing & Search Core (`src/`)
 The search engine logic is built from scratch without relying on heavy search libraries like ElasticSearch.
 
