@@ -86,3 +86,7 @@ root/
 ├── templates/               # HTML Frontend
 ├── requirements.txt         # Dependencies
 └── run.py                   # App Entry Point
+```
+
+## Author
+- [itsvnvr](https://github.com/itsvnvr)
