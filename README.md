@@ -89,4 +89,8 @@ root/
 ```
 
 ## Author
-- [itsvnvr](https://github.com/itsvnvr)
+**Nguyen Phuong Vu**
+
+- LinkedIn: [Vu Nguyen](https://www.linkedin.com/in/vu-nguyen-454889335/)
+- GitHub: - [itsvnvr](https://github.com/itsvnvr)
+- Email: iamvuphuong2005@gmail.com
